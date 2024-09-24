@@ -31,13 +31,19 @@ x_under <- data.frame(x = sort(x),
 # x_under <- x_under %>%
 #   mutate(psi = psi_x(x = x, theta = 0.0312))
 
+vec <- c(0.0312, 0, 0, 0)
+for(i in 2:length(vec)){
+  i_0 <- vec[i-1]
+  vec[i] <- i_0 / 2
+}
+vec
 
 x_under <- x_under %>%
   mutate(theta = case_when(
-    x <= 0.0312 & x > 0.0156 ~ 0.01,
-    x <= 0.0156 & x > 0.00781 ~ 0.01,
-    x <= 0.00781 & x > 0.00391 ~ 0.001,
-    x < 0.00391 ~ 0.0001,
+    x <= vec[1] & x > vec[2] ~ 0.01,
+    x <= vec[2] & x > vec[3] ~ 0.01,
+    x <= vec[3] & x > vec[4] ~ 0.001,
+    x < vec[4] ~ 0.0001,
     .default = 1
   ))
 
@@ -68,6 +74,17 @@ mle_and_plot(x_obs$x, lbn_p = TRUE)
 x_obs_bin$binVals$binMax[index_peak]
 
 mle_and_plot(x = x_obs$x[x_obs$x>x_obs_bin$binVals$binMax[index_peak]], lbn_p = TRUE)
+
+
+
+calcLike(negLL.fn = negLL.PLB,
+         x = x_obs$x[x_obs$x>x_obs_bin$binVals$binMax[index_peak]],
+         xmin = 0.001,#0.01563533, #min(x), # 0.0026
+         xmax = 8.880261,
+         n = 472,
+         sumlogx = -1384.32,
+         p = -1.5,
+         suppress.warnings = TRUE)
 
 sim_auto_c <- function(sim_df,
                        xmin = 0.001,
