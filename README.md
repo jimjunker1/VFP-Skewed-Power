@@ -25,6 +25,20 @@ Here, we use a simulation framework with repeated sampling to explore how unders
 5. $\hat \lambda'$ is estimated using $X_{obs}'$ data.  
 6. Results of repeated simulation runs are compiled to produce distributions of $\hat \lambda_{obs}$ and $\hat \lambda_{obs}'$ and compared to the known value of $\lambda$ used in the original simulations.   
 
+
+### $x_{min, model}$  
+A separate analysis needs to be run for investigating the effects of the $x_{min, model}$ value.  
+
+1. $x_{min, model} = \theta_c$  Use the smallest size in the "cut" data as the smallest size in the model to estimate $\lambda$ .  
+2. $x_{min, model} = x_{min}$  Use the smallest known value. i.e., we know there is an individual of ~0.001 in this community, but we didn't sample it.  
+3. $x_{min, model} = x_{min observed}$  Use the smallest value in the undersampled data, even though those values may be removed in the "cut" data to inform the model.  
+
+How do we deal with the above in the "observed" data?  
+* known minimum ~ 0.001  
+* observed minimum (probably below the "peak")  
+* global minimum; between 0.001 and the peak?
+
+
 ## Variables and quantities  
 
 | Variable  | Brief Description |
