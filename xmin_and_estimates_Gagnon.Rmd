@@ -1,0 +1,296 @@
+---
+title: "Estimates and xmin cutoff"
+author: "Justin Pomeranz"
+date: "Started 2025-04-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview  
+
+This document was written in response to a question from Charles Gagnon. The question is RE how comparable $\lambda$ estimates are when the body size samples have different estimates for the undersampling cutoff, e.g., the estimated $x_{min}$ from the `poweRlaw` package. 
+
+
+# Setup  
+
+## Libraries  
+
+```{r, warning=FALSE, message=FALSE}
+library(poweRlaw)
+# install sizeSpectra if needed from Andrew Edwards gitHub
+# Note that `remotes` package is also required
+# install.packages("remotes")    # If you do not already have the "remotes" package
+# remotes::install_github("andrew-edwards/sizeSpectra")
+library(sizeSpectra)
+library(tidyverse)
+```
+
+
+## Simulate data  
+
+* $\lambda$ = -2  
+* `xmin` = 0.01 mg dry mass  
+* `xmax` = 75 mg dry mass  
+
+Values are based on what could be expected in a benthic macroinvertebrate sample.  
+```{r}
+set.seed(2112)
+x <- rPLB(5000, b = -2, xmin = 0.1, xmax = 75)
+
+```
+
+* Make a dataframe with a `theta` column  
+* `theta` will be used to define the cutoff, e.g. the level below which body sizes are undersampled  
+
+```{r}
+dat1 <- data.frame(x = sort(x))
+
+ggplot(dat1, aes(x = x)) +
+  geom_histogram(binwidth = 0.01) +
+  scale_x_log10() +
+  labs(title = "Original sample of x")
+```
+
+* Create 2 data frames, each with a different cutoff  
+
+```{r}
+dat2 <- dat1
+dat1$theta <- 0.5
+dat2$theta <- 1
+
+```
+
+* add a probability of sampling, based on if x >= theta  
+
+```{r}
+dat1 <- dat1 |>
+  mutate(pr = case_when(
+    x < theta ~ 0.01, 
+    .default = 1
+  ))
+dat1 |>
+  group_by(pr) |>
+  count()
+
+obs1 <- dat1 |>
+  sample_n(size = 1000, weight = pr)
+obs1 |>
+  group_by(pr) |>
+  count()
+
+
+ggplot(obs1, aes(x = x)) +
+  geom_histogram(binwidth = 0.01) +
+  scale_x_log10() +
+  labs(title = "Observation, undersample = 0.1")
+
+powerlaw = conpl$new(obs1$x) 
+xmin1 = estimate_xmin(powerlaw)$xmin
+xmin1
+# estimate lambda using size spectra
+obs1$xmin = xmin1
+trim1 <- obs1 |>
+  filter(x > xmin)
+
+ggplot(trim1, aes(x = x)) +
+  geom_histogram(binwidth = 0.01) +
+  scale_x_log10() +
+  labs(title = "trimmed Observation")
+# estimate lambda from size spectra package
+calcLike(
+      negLL.fn = negLL.PLB, # continuous estimates of all individuals
+      x = trim1$x, # the vector of data
+      xmin = min(trim1$x), # the minimum body size
+      xmax = max(trim1$x), # the maximum body size
+      n = length(trim1$x), # the number of observations
+      sumlogx = sum(log(trim1$x)), # sum of log-transformed data
+      p = -1.5) # starting point, arbitrary number
+```
+
+
+
+* dat2  
+
+```{r}
+dat2 <- dat2 |>
+  mutate(pr = case_when(
+    x < theta ~ 0.01, 
+    .default = 1
+  ))
+dat2 |>
+  group_by(pr) |>
+  count()
+
+obs2 <- dat2 |>
+  sample_n(size = 1000, weight = pr)
+obs2 |>
+  group_by(pr) |>
+  count()
+
+
+ggplot(obs2, aes(x = x)) +
+  geom_histogram(binwidth = 0.01) +
+  scale_x_log10() +
+  labs(title = "Observation, undersample = 1")
+
+powerlaw = conpl$new(obs2$x) 
+xmin2 = estimate_xmin(powerlaw)$xmin
+xmin2
+# estimate lambda using size spectra
+obs2$xmin = xmin2
+trim2 <- obs2 |>
+  filter(x > xmin)
+
+ggplot(trim2, aes(x = x)) +
+  geom_histogram(binwidth = 0.01) +
+  scale_x_log10() +
+  labs(title = "trimmed 2 Observation")
+# estimate lambda from size spectra package
+calcLike(
+      negLL.fn = negLL.PLB, # continuous estimates of all individuals
+      x = trim2$x, # the vector of data
+      xmin = min(trim2$x), # the minimum body size
+      xmax = max(trim2$x), # the maximum body size
+      n = length(trim2$x), # the number of observations
+      sumlogx = sum(log(trim2$x)), # sum of log-transformed data
+      p = -1.5) # starting point, arbitrary number
+```
+
+
+# Functionalize this for testing  
+
+```{r}
+test_xmin <- function(seed = 2112,
+                      n_orig = 5000,
+                      b = -2,
+                      plb_xmin = 0.1,
+                      plb_xmax = 75,
+                      theta_value = 1,
+                      pr_under = 0.01,
+                      pr_over = 1,
+                      binwidth = 0.01,
+                      n_sub_sample = 1000){
+  set.seed(seed)
+  # sample body sizes
+  x <- rPLB(n_orig, b = b, xmin = plb_xmin, xmax = plb_xmax)
+  # make a dataframe with a theta column
+  dat <- data.frame(x = sort(x),
+                    theta = theta_value)
+  # add a pr column; probability of being resampled
+  dat <- dat |>
+  mutate(pr = case_when(
+    x < theta ~ pr_under, 
+    .default = pr_over
+  ))
+  # simulate an observed data set
+  obs <- dat |>
+    sample_n(size = n_sub_sample, weight = pr)
+  
+  # estimate the xmin for the observed data
+  powerlaw = conpl$new(obs$x) 
+  est_xmin = estimate_xmin(powerlaw)$xmin
+  # add estimated xmin to observed data set
+  obs$est_xmin = est_xmin
+  trim <- obs |>
+    filter(x > est_xmin)
+  
+  # estimate lambda from size spectra package
+  est_lambda <- calcLike(
+    negLL.fn = negLL.PLB, # continuous estimates of all individuals
+    x = trim1$x, # the vector of data
+    xmin = min(trim1$x), # the minimum body size
+    xmax = max(trim1$x), # the maximum body size
+    n = length(trim1$x), # the number of observations
+    sumlogx = sum(log(trim1$x)), # sum of log-transformed data
+    p = -1.5) # starting point, arbitrary number
+  
+  out <- data.frame(est_xmin = est_xmin,
+             actual_xmin = theta_value,
+             est_lambda = est_lambda$MLE,
+             est_lambda_low = est_lambda$conf[1],
+             est_lambda_high = est_lambda$conf[2],
+             actual_lamba = b)
+  # combine obs and trimmed data for plotting  
+  obs$group <- "observed"
+  trim$group <- "trimmed"
+  d2 <- bind_rows(obs, trim)
+  p <- ggplot(d2, aes(x = x)) +
+    geom_histogram(binwidth = binwidth) +
+    scale_x_log10() +
+    facet_wrap(~group)
+  print(p)
+  
+  
+  return(out)
+}
+```
+
+* Use the function  
+
+```{r}
+# default values
+test_xmin(theta_value = 1)
+
+```
+
+### changing `theta` values
+```{r}
+test_xmin(theta_value = 2)
+test_xmin(theta_value = 0.5)
+test_xmin(theta_value = 0.1)
+```
+
+* with high cutoffs, the function does not work well  
+
+```{r}
+test_xmin(theta_value = 5)
+```
+
+* I think this is an artifact of the way I sub sample  
+* If we also increase the body size ranges, it does seem to still work  
+
+```{r}
+test_xmin(theta_value = 5,
+          plb_xmin = 1,
+          plb_xmax = 1000)
+```
+
+* I think this is because the probability of sampling a really large body size in `rPLB()` is rare to begin with.  
+* Let's increase the original sample size and see if that helps  
+
+```{r}
+test_xmin(theta_value = 5,
+          n_orig = 10000)
+```
+
+* I think this goves us enough large body sizes to actually sub sample them.  
+* When there are not many sizes present in the original, the sub sample still ends up with a lot of small sizes, even though the probability of sampling it is small i.e., 1 %  
+
+
+* Oh, wait... I just remembered the default in `sample_n(replace = FALSE)`.  
+* Setting that to `TRUE` may change this, and it might still appropriately undersample the small body sizes.  
+
+
+# Future tests  
+
+These would likely require modifying the function I wrote above  
+
+1. Does using the "wrong" cutoff still lead to better estimates?  
+  * i.e., Charles has cut offs of mostly ~2-3.  
+  * Would using a global value of 2.5 be ok?  
+  * Try different cutoffs and estimate lambda to see distribution  
+  * I'm guessing it will be ok, but probably still introducing some error  
+  * I bet it wil be greatest for those sites that had estimated xmins at ~9  
+  * Does overcompensating the cutoff still lead to reasonable estimates?  
+    * i.e., global cutoff of your max estimate at ~9?  
+  
+2. How "off" are lambda estimates in untrimmed data?  
+  * I'm guessing off by a lot  
+  * My intuition tells me that it's better to get accurate lambda estimates, regardless of where the cutoff is.  
+  * If you estimate lambda with undersampled data, I bet your lambdas are wrong, so comparing them may be meaningless. i.e., this random number is different from this other random number, and they are both different from this number that is correct.  
+  
+  
+  
