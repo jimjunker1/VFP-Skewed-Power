@@ -10,16 +10,22 @@ Power laws describe many phenomena in the natural and biological sciences. In ec
 
 Maximum likelihood estimation (MLE) has been shown to be the most reliable and robust method for estimating parameters describing a power. However, empirical observations which are thought to follow a power law distribution often display undersampling of the smallest values, often attributed to artefacts from the collection techniques. For example, when sampling fish, the mesh sized used has a range of fish which it is optimized for. Fish which are too big are not effectively sampled because they are unable to enter the mesh in the first place, while fish that are too small are able to swim through the mesh without being captured. On the small end, there is a smooth decline in capture efficiencies where fish which are small, but not too small, are still captured but they are captured at lower rates than their true population densities would suggest. As the fish get smaller, the probability of capture declines until reaching zero. 
 
-A common method in the literature is to estimate where the undersampling occurs (either mechanistically or using arbitrary but reasonable values) and to trim the data such that the minimum value is equal to the estimated value where undersampling begins. 
+A common method in the literature is to estimate where the undersampling occurs (either mechanistically or using arbitrary but reasonable values) and to trim the data such that the minimum value is equal to the estimated value where under sampling begins. 
 
 However, it remains unclear how much estimates of power law exponents are affected by undersampling of the smallest body sizes. 
 
-Here, we use a simulation framework with repeated sampling to explore how undersampling may affect estimates of power law exponents. We sample body size values from a known distribution and then artificially undersample some range of small body sizes to investigate the deviance of estimates from the known values. Furthermore, we explore methods for correcting bias in estimates through trimming the data and using model estimates to "correct" the underlying observations. 
+Here, we use a simulation framework with repeated sampling to explore how under sampling may affect estimates of power law exponents. We sample body size values from a known distribution and then artificially under sample some range of small body sizes to investigate the deviance of estimates from the known values. Furthermore, we explore methods for correcting bias in estimates through trimming the data and using model estimates to "correct" the underlying observations. 
+
+![Conceptual figure showing power law distribution of known sample (in black bars) and simulated under sampling (in pink bars)]("plots/under_sample_conceptual.png")
+
+# Below this is from an earlier version  
+
+* JPZ will re-write this once the simulation framework is confirmed.  
 
 ## Basic workflow  
 
-1. A vector of 10,000 body sizes, $X$ is sampled from a bounded power law.  
-2. A vector of 1,000 body sizes, $X_{obs}$, is re-sampled from $X$ so that small body sizes are undersampled. 
+1. A vector of $N$ body sizes, $X$ is sampled from a bounded power law.  
+2. A vector of 1,000 body sizes, $X_{obs}$, is re-sampled from $X$ so that small body sizes are under sampled. 
 3. $\hat \lambda_{obs}$ is estimated from the vector $X_{obs}$.  
 4. $X_{obs}'$ is made by trimming $X_{obs}$ so that the smallest value ($x_{min}$) is $\gt$ the cutoff value, $\theta_c$. $\theta_c$ is either set beforehand or estimated automatically based on the "peak" of the observed data.   
 5. $\hat \lambda'$ is estimated using $X_{obs}'$ data.  

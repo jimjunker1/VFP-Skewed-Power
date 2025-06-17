@@ -216,6 +216,7 @@ plot_unsub_lambda <- function(
     b = 2.5, 
     vecDiff = 2,
     plot = TRUE,
+    plot_back_est_n = FALSE,
     bin_width = 0.1){
   # sample from bounded power law
   x <- rPLB(n = n, b = lambda, xmin = xmin, xmax = xmax)
@@ -310,7 +311,7 @@ plot_unsub_lambda <- function(
   x_df2$est_xmin <- x_xmin
   
   # plot ####
-  if(plot == TRUE){
+  if(plot == TRUE & plot_back_est_n == TRUE){
     p <- ggplot(x_df2,
                 aes(x = x, 
                     fill = fill)) +
@@ -322,6 +323,25 @@ plot_unsub_lambda <- function(
       scale_x_log10() +
       geom_vline(aes(xintercept = est_xmin),
                  linetype = "dashed", color = "black") +
+      # scale_y_log10() +
+      theme_bw() 
+    
+    print(p)
+  }
+  
+  if(plot == TRUE & plot_back_est_n == FALSE){
+    x_df3 <- bind_rows(x_orig_df, x_under)
+    p <- ggplot(x_df3,
+                aes(x = x, 
+                    fill = fill)) +
+      geom_histogram(binwidth = bin_width,
+                     position = "dodge2") +
+      scale_fill_manual(values = c(#"dodgerblue",
+                                   #"coral", "maroon",
+                                   "black", "pink"))+
+      scale_x_log10() +
+      # geom_vline(aes(xintercept = est_xmin),
+      #            linetype = "dashed", color = "black") +
       # scale_y_log10() +
       theme_bw() 
     

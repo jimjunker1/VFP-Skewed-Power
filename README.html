@@ -388,25 +388,38 @@ capture declines until reaching zero.</p>
 <p>A common method in the literature is to estimate where the
 undersampling occurs (either mechanistically or using arbitrary but
 reasonable values) and to trim the data such that the minimum value is
-equal to the estimated value where undersampling begins.</p>
+equal to the estimated value where under sampling begins.</p>
 <p>However, it remains unclear how much estimates of power law exponents
 are affected by undersampling of the smallest body sizes.</p>
 <p>Here, we use a simulation framework with repeated sampling to explore
-how undersampling may affect estimates of power law exponents. We sample
-body size values from a known distribution and then artificially
-undersample some range of small body sizes to investigate the deviance
+how under sampling may affect estimates of power law exponents. We
+sample body size values from a known distribution and then artificially
+under sample some range of small body sizes to investigate the deviance
 of estimates from the known values. Furthermore, we explore methods for
 correcting bias in estimates through trimming the data and using model
 estimates to “correct” the underlying observations.</p>
+<div class="float">
+<img src="%22plots/under_sample_conceptual.png%22" alt="Conceptual figure showing power law distribution of known sample (in black bars) and simulated under sampling (in pink bars)" />
+<div class="figcaption">Conceptual figure showing power law distribution
+of known sample (in black bars) and simulated under sampling (in pink
+bars)</div>
 </div>
+</div>
+</div>
+<div id="below-this-is-from-an-earlier-version" class="section level1">
+<h1>Below this is from an earlier version</h1>
+<ul>
+<li>JPZ will re-write this once the simulation framework is
+confirmed.</li>
+</ul>
 <div id="basic-workflow" class="section level2">
 <h2>Basic workflow</h2>
 <ol style="list-style-type: decimal">
-<li>A vector of 10,000 body sizes, <span class="math inline">\(X\)</span> is sampled from a bounded power
+<li>A vector of <span class="math inline">\(N\)</span> body sizes, <span class="math inline">\(X\)</span> is sampled from a bounded power
 law.<br />
 </li>
-<li>A vector of 1,000 body sizes, <span class="math inline">\(X_{obs}\)</span>, is re-sampled from <span class="math inline">\(X\)</span> so that small body sizes are
-undersampled.</li>
+<li>A vector of 1,000 body sizes, <span class="math inline">\(X_{obs}\)</span>, is re-sampled from <span class="math inline">\(X\)</span> so that small body sizes are under
+sampled.</li>
 <li><span class="math inline">\(\hat \lambda_{obs}\)</span> is estimated
 from the vector <span class="math inline">\(X_{obs}\)</span>.<br />
 </li>
@@ -424,6 +437,29 @@ and <span class="math inline">\(\hat \lambda_{obs}&#39;\)</span> and
 compared to the known value of <span class="math inline">\(\lambda\)</span> used in the original
 simulations.</li>
 </ol>
+<div id="x_min-model" class="section level3">
+<h3><span class="math inline">\(x_{min, model}\)</span></h3>
+<p>A separate analysis needs to be run for investigating the effects of
+the <span class="math inline">\(x_{min, model}\)</span> value.</p>
+<ol style="list-style-type: decimal">
+<li><span class="math inline">\(x_{min, model} = \theta_c\)</span> Use
+the smallest size in the “cut” data as the smallest size in the model to
+estimate <span class="math inline">\(\lambda\)</span> .<br />
+</li>
+<li><span class="math inline">\(x_{min, model} = x_{min}\)</span> Use
+the smallest known value. i.e., we know there is an individual of ~0.001
+in this community, but we didn’t sample it.<br />
+</li>
+<li><span class="math inline">\(x_{min, model} = x_{min
+observed}\)</span> Use the smallest value in the undersampled data, even
+though those values may be removed in the “cut” data to inform the
+model.</li>
+</ol>
+<p>How do we deal with the above in the “observed” data?<br />
+* known minimum ~ 0.001<br />
+* observed minimum (probably below the “peak”)<br />
+* global minimum; between 0.001 and the peak?</p>
+</div>
 </div>
 <div id="variables-and-quantities" class="section level2">
 <h2>Variables and quantities</h2>

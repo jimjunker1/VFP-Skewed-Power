@@ -12,8 +12,17 @@ set.seed(999)
 plot_unsub_lambda(n = 5000, 
                   xmin = 0.001, 
                   h = 1e-05, 
-                  b = 2)
+                  b = 2,
+                  plot_back_est_n = TRUE)
 ggsave("plots/back_est_n_example.png", width = 9.35, height = 4.1)
+
+set.seed(1390)
+plot_unsub_lambda(n = 5000, 
+                  xmin = 0.001, 
+                  h = 1e-05, 
+                  b = 2,
+                  plot_back_est_n = FALSE)
+ggsave("plots/under_sample_conceptual.png", width = 9.35, height = 4.1)
 
 # read in simulaiton
 # note that I forgot to remove the "test" from the name when I saved the full run. This is the most recent and complete data. 
