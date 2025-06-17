@@ -192,3 +192,15 @@ sim |>
   scale_color_viridis_d(option = "plasma")
 
 
+sim |>
+  filter(known_lambda == -2, 
+         original_n == 5000) |>
+  ggplot(aes(x = est_xmin,
+             fill = as.factor(known_lambda))) +
+  stat_halfeye(alpha = 0.5, 
+               normalize = "panels") +
+  facet_wrap(h~b,
+             #scales = "free",
+             ncol = 2) +
+  scale_x_log10()
+  
