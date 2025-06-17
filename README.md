@@ -16,7 +16,7 @@ However, it remains unclear how much estimates of power law exponents are affect
 
 Here, we use a simulation framework with repeated sampling to explore how under sampling may affect estimates of power law exponents. We sample body size values from a known distribution and then artificially under sample some range of small body sizes to investigate the deviance of estimates from the known values. Furthermore, we explore methods for correcting bias in estimates through trimming the data and using model estimates to "correct" the underlying observations. 
 
-![Conceptual figure showing power law distribution of known sample (in black bars) and simulated under sampling (in pink bars)]("plots/under_sample_conceptual.png")
+![Conceptual figure showing power law distribution of known sample (in black bars) and simulated under sampling (in pink bars)](plots/under_sample_conceptual.png)
 
 # Below this is from an earlier version  
 
