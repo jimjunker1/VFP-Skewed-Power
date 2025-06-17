@@ -248,12 +248,12 @@ rep_res %>%
        x = "Minimum cut off size",
        caption = "Relationship between lambda estimate and known value (red horizontal dashed line and facet title). Psi is the probability of undersampling body sizes below a threshold. \n Here, the threshold is kept constant at 0.05 and is represented by a vertical black dashed line. The orange line is the lambda estimate when sizes are undersampled but all data is used. \n The purple line is the estimate when data is cutoff at different values (x-axis). The estimates improve when undersampled data is removed, even if the data is cutoff 'above' the undersampled value")
 
-names(rep_res)
-rep_res %>%
-  mutate(l_diff = lambda - lambda_est,
-         cut_diff = lambda - cut_lambda_est) %>%
-  group_by(lambda, theta_c) %>%
-  summarize(mean(l_diff), sd(l_diff),
-            mean(cut_diff), sd(cut_diff)) %>%
-  View()
+# names(rep_res)
+# rep_res %>%
+#   mutate(l_diff = lambda - lambda_est,
+#          cut_diff = lambda - cut_lambda_est) %>%
+#   group_by(lambda, theta_c) %>%
+#   summarize(mean(l_diff), sd(l_diff),
+#             mean(cut_diff), sd(cut_diff)) %>%
+#   View()
 
