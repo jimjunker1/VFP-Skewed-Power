@@ -445,7 +445,8 @@ compare_est_pareto_n <- function(
   est_tot_n_under <- estimate_pareto_N(
     n = under_n,
     lambda = lambda_under$MLE,
-    xmin =  x_df$est_xmin[1],
+# x_min ???####
+    xmin =  x_df$est_xmin[1],#should this just be x_min?? 
     xmin2 = xmin,
     xmax = xmax)
   
